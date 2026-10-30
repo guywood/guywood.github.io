@@ -94,6 +94,8 @@ final class LoadViewModel {
 
     /// Applies the flight's outcome to the matching item and forgets the flight.
     func finishFlight(_ flight: Flight, items: [ClothingItem]) {
+        // A flight cancelled in the meantime (for example by `emptyDrum`) must not apply its outcome.
+        guard flights.contains(where: { $0.id == flight.id }) else { return }
         flights.removeAll { $0.id == flight.id }
         guard let item = items.first(where: { $0.uuid == flight.itemID }) else { return }
         item.isInDrum = (flight.direction == .intoDrum)

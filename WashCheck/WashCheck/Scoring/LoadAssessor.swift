@@ -90,24 +90,24 @@ struct LoadAssessor: Sendable {
                 points += weights.highBleedWithWhitesOrLights
                 severity = .high
                 message = "\(source.name) may bleed onto \(target.name)."
-                notes.append("High bleed risk next to whites or lights (+\(weights.highBleedWithWhitesOrLights)).")
+                notes.append("High bleed risk next to whites or lights.")
             } else if target.colourGroup == .brights {
                 points += weights.highBleedWithOtherBrights
                 severity = .medium
                 message = "\(source.name) could tint \(target.name)."
-                notes.append("High bleed risk with other bright colours (+\(weights.highBleedWithOtherBrights)).")
+                notes.append("High bleed risk with other bright colours.")
             }
         case .medium:
             if target.colourGroup == .whites {
                 points += weights.mediumBleedWithWhites
                 severity = .medium
                 message = "\(source.name) might bleed onto \(target.name)."
-                notes.append("Medium bleed risk with whites (+\(weights.mediumBleedWithWhites)).")
+                notes.append("Medium bleed risk with whites.")
             } else if target.colourGroup == .lights {
                 points += weights.mediumBleedWithLights
                 severity = .low
                 message = "\(source.name) might slightly tint \(target.name)."
-                notes.append("Medium bleed risk with lights and pastels (+\(weights.mediumBleedWithLights)).")
+                notes.append("Medium bleed risk with lights and pastels.")
             }
         case .low:
             break
@@ -121,18 +121,18 @@ struct LoadAssessor: Sendable {
                 severity = .low
                 message = "\(source.name) is red or pink, the classic dye culprit, next to \(target.name)."
             }
-            notes.append("Red and pink dyes are the classic culprits (+\(weights.redsExtra)).")
+            notes.append("Red and pink dyes are the classic culprits.")
         }
 
         guard let resolvedSeverity = severity, points > 0 else { return [] }
 
         if source.isNew {
             points += weights.newItemExtra
-            notes.append("\(source.name) is new or never washed (+\(weights.newItemExtra)).")
+            notes.append("\(source.name) is new or never washed.")
         }
         if target.isNew {
             points += weights.newItemExtra
-            notes.append("\(target.name) is new or never washed (+\(weights.newItemExtra)).")
+            notes.append("\(target.name) is new or never washed.")
         }
 
         return [Concern(
@@ -163,7 +163,7 @@ struct LoadAssessor: Sendable {
                 points: weights.heavyWithDelicate,
                 itemIDs: [heavier.id, lighter.id],
                 message: "\(heavier.name) will abrade and snag \(lighter.name).",
-                detail: "Heavy items tumbling against delicates cause abrasion and snagging (+\(weights.heavyWithDelicate))."
+                detail: "Heavy items tumbling against delicates cause abrasion and snagging."
             ))
         case (.heavy, .light):
             result.append(Concern(
@@ -173,7 +173,7 @@ struct LoadAssessor: Sendable {
                 points: weights.heavyWithLight,
                 itemIDs: [heavier.id, lighter.id],
                 message: "\(heavier.name) is much heavier than \(lighter.name) and will rub and tangle it.",
-                detail: "Heavy with light (+\(weights.heavyWithLight))."
+                detail: "Heavy with light."
             ))
         case (.medium, .delicate):
             result.append(Concern(
@@ -183,7 +183,7 @@ struct LoadAssessor: Sendable {
                 points: weights.mediumWithDelicate,
                 itemIDs: [heavier.id, lighter.id],
                 message: "\(heavier.name) is heavier than \(lighter.name) and may rub it.",
-                detail: "Medium with delicate (+\(weights.mediumWithDelicate))."
+                detail: "Medium with delicate."
             ))
         default:
             break
@@ -220,7 +220,7 @@ struct LoadAssessor: Sendable {
             points: weights.lintOnDarksOrDelicates,
             itemIDs: [source.id, target.id],
             message: message,
-            detail: "Lint shedders next to darks or delicates (+\(weights.lintOnDarksOrDelicates))."
+            detail: "Lint shedders next to darks or delicates."
         )]
     }
 
@@ -234,7 +234,7 @@ struct LoadAssessor: Sendable {
             points: weights.hardwareWithDelicate,
             itemIDs: [source.id, target.id],
             message: "Zips or hooks on \(source.name) can snag \(target.name).",
-            detail: "Hardware next to a delicate item (+\(weights.hardwareWithDelicate))."
+            detail: "Hardware next to a delicate item."
         )]
     }
 
@@ -249,7 +249,7 @@ struct LoadAssessor: Sendable {
                 points: weights.woolWithHeavy,
                 itemIDs: [candidate.wool.id, candidate.other.id],
                 message: "\(candidate.wool.name) can felt from agitation against \(candidate.other.name).",
-                detail: "Wool or cashmere with anything heavy (+\(weights.woolWithHeavy))."
+                detail: "Wool or cashmere with anything heavy."
             )]
         }
         return []
@@ -266,7 +266,7 @@ struct LoadAssessor: Sendable {
                 points: weights.athleticWithHeavyLint,
                 itemIDs: [candidate.athletic.id, candidate.shedder.id],
                 message: "Lint from \(candidate.shedder.name) will trap in the synthetic fibres of \(candidate.athletic.name).",
-                detail: "Athletic or synthetic with a heavy lint shedder (+\(weights.athleticWithHeavyLint))."
+                detail: "Athletic or synthetic with a heavy lint shedder."
             )]
         }
         return []
@@ -284,7 +284,7 @@ struct LoadAssessor: Sendable {
             points: weights.handWashOnlyInLoad,
             itemIDs: [item.id],
             message: "\(item.name) is hand-wash only and shouldn't go in a machine load with other items.",
-            detail: "Hand-wash only in a load of two or more other items (+\(weights.handWashOnlyInLoad))."
+            detail: "Hand-wash only in a load of two or more other items."
         )]
     }
 
@@ -300,7 +300,7 @@ struct LoadAssessor: Sendable {
             points: weights.mixedWeightSpan,
             itemIDs: [],
             message: "Very mixed load: delicates and heavy items spin and dry differently.",
-            detail: "The load spans Delicate through Heavy (+\(weights.mixedWeightSpan))."
+            detail: "The load spans Delicate through Heavy."
         )]
     }
 
