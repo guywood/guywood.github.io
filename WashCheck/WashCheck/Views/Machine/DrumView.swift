@@ -116,12 +116,20 @@ struct DrumView: View {
                     .accessibilityHidden(true)
             }
 
-            // Chips around the ring. Positions follow the drum angle; the glyphs stay upright.
-            ForEach(placed) { item in
-                slotView(item.slot, diameter: chipDiameter)
-                    .transition(chipTransition)
-                    .position(chipPosition(index: item.index, count: placed.count, angle: angle, center: center, radius: radius))
+            // Chips around the ring. The whole ring turns with the drum; each glyph counter-rotates
+            // so it stays upright. Slot positions depend only on the chip count, so when a chip lands
+            // or leaves, the others glide to their new slots instead of snapping.
+            ZStack {
+                ForEach(placed) { item in
+                    slotView(item.slot, diameter: chipDiameter)
+                        .rotationEffect(.degrees(-angle))
+                        .transition(chipTransition)
+                        .position(chipPosition(index: item.index, count: placed.count, center: center, radius: radius))
+                }
             }
+            .frame(width: glassDiameter, height: glassDiameter)
+            .animation(.spring(response: 0.35, dampingFraction: 0.7), value: placed.count)
+            .rotationEffect(.degrees(angle))
         }
         .frame(width: glassDiameter, height: glassDiameter)
     }
@@ -146,14 +154,15 @@ struct DrumView: View {
         }
     }
 
-    /// Where chip `index` of `count` sits: evenly spaced around a ring (about 55 % of the glass
-    /// radius, alternating slightly in and out so neighbours overlap less), rotated by the drum angle.
-    private func chipPosition(index: Int, count: Int, angle: Double, center: CGPoint, radius: CGFloat) -> CGPoint {
+    /// Where chip `index` of `count` sits before the drum's rotation is applied: evenly spaced
+    /// around a ring (about 55 % of the glass radius, alternating slightly in and out so neighbours
+    /// overlap less).
+    private func chipPosition(index: Int, count: Int, center: CGPoint, radius: CGFloat) -> CGPoint {
         let safeCount: Int = max(1, count)
         let baseAngle: Double = 360.0 * Double(index) / Double(safeCount)
         let ringFraction: Double = (index % 2 == 0) ? 0.49 : 0.61
         let ringRadius: CGFloat = radius * CGFloat(ringFraction)
-        let radians: Double = (baseAngle + angle - 90) * Double.pi / 180
+        let radians: Double = (baseAngle - 90) * Double.pi / 180
         let x: CGFloat = center.x + ringRadius * CGFloat(cos(radians))
         let y: CGFloat = center.y + ringRadius * CGFloat(sin(radians))
         return CGPoint(x: x, y: y)
@@ -168,14 +177,19 @@ private struct DrumItemChip: View {
     let diameter: CGFloat
     let action: () -> Void
 
+    private var tint: Color {
+        return itemTint(hex: chip.tintHex, colourGroup: chip.colourGroup)
+    }
+
     var body: some View {
         Button(action: action) {
             ZStack {
                 Circle()
-                    .fill(itemTint(hex: chip.tintHex, colourGroup: chip.colourGroup))
+                    .fill(tint)
                 Circle()
                     .strokeBorder(Color.primary.opacity(0.15), lineWidth: 1)
                 ItemIconView(icon: chip.icon, size: 18)
+                    .environment(\.colorScheme, tint.contrastingScheme)
             }
             .frame(width: diameter, height: diameter)
             .overlay(alignment: .topTrailing) {

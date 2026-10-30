@@ -26,6 +26,7 @@ struct WashingMachineView: View {
     let onTapChip: (DrumChip) -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOverEnabled
 
     private let machineHeight: CGFloat = 240
     private let footHeight: CGFloat = 8
@@ -55,14 +56,22 @@ struct WashingMachineView: View {
         .frame(height: machineHeight)
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("Washing machine, \(chips.count) items in the drum")
+        .accessibilityLabel(machineLabel)
+    }
+
+    private var machineLabel: String {
+        switch chips.count {
+        case 0: return "Washing machine, empty drum"
+        case 1: return "Washing machine, 1 item in the drum"
+        default: return "Washing machine, \(chips.count) items in the drum"
+        }
     }
 
     // MARK: - Body and feet
 
     private var machineBody: some View {
         RoundedRectangle(cornerRadius: bodyCornerRadius, style: .continuous)
-            .fill(Color(.secondarySystemBackground))
+            .fill(Color(.secondarySystemGroupedBackground))
             .overlay(
                 RoundedRectangle(cornerRadius: bodyCornerRadius, style: .continuous)
                     .strokeBorder(Color.primary.opacity(0.1), lineWidth: 1)
@@ -102,7 +111,7 @@ struct WashingMachineView: View {
     private var knob: some View {
         ZStack(alignment: .top) {
             Circle()
-                .fill(Color(.tertiarySystemBackground))
+                .fill(Color(.tertiarySystemGroupedBackground))
                 .overlay(Circle().strokeBorder(Color.primary.opacity(0.18), lineWidth: 1.5))
             Capsule()
                 .fill(Color.primary.opacity(0.5))
@@ -155,7 +164,7 @@ struct WashingMachineView: View {
             ZStack {
                 // Door ring.
                 Circle()
-                    .fill(Color(.tertiarySystemBackground))
+                    .fill(Color(.tertiarySystemGroupedBackground))
                     .overlay(Circle().strokeBorder(Color.primary.opacity(0.12), lineWidth: 1))
                     .frame(width: ringDiameter, height: ringDiameter)
                     .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
@@ -196,11 +205,12 @@ struct WashingMachineView: View {
                 )
                 .accessibilityHidden(true)
 
+            // VoiceOver users need chips that hold still so the cursor can land on them.
             DrumView(
                 chips: chips,
                 glassDiameter: diameter,
                 revolutionsPerSecond: revolutionsPerSecond,
-                reduceMotion: reduceMotion,
+                reduceMotion: reduceMotion || voiceOverEnabled,
                 onTapChip: onTapChip
             )
 

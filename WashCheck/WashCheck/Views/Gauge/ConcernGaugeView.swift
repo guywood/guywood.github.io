@@ -67,7 +67,7 @@ struct ConcernGaugeView: View {
                     Text("\(assessment.score)")
                         .font(.caption.weight(.bold))
                         .monospacedDigit()
-                        .foregroundStyle(.white)
+                        .foregroundStyle(fillColor.prefersDarkForeground ? Color.black : Color.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                         .contentTransition(.numericText())

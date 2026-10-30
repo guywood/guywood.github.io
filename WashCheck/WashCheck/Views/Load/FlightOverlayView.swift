@@ -11,13 +11,25 @@ import SwiftUI
 @MainActor
 struct FlightOverlayView: View {
     let flight: LoadViewModel.Flight
+    /// The latest reported frame for a key, so the glyph retargets if the layout shifts mid-flight.
+    let liveFrame: (FrameKey) -> CGRect?
     let onFinished: (LoadViewModel.Flight) -> Void
 
     @State private var progress: CGFloat = 0
 
-    init(flight: LoadViewModel.Flight, onFinished: @escaping (LoadViewModel.Flight) -> Void) {
+    init(
+        flight: LoadViewModel.Flight,
+        liveFrame: @escaping (FrameKey) -> CGRect?,
+        onFinished: @escaping (LoadViewModel.Flight) -> Void
+    ) {
         self.flight = flight
+        self.liveFrame = liveFrame
         self.onFinished = onFinished
+    }
+
+    /// The frame key this flight lands on.
+    private var destinationKey: FrameKey {
+        return flight.direction == .intoDrum ? .porthole : .card(flight.itemID)
     }
 
     /// Cards shrink as they drop into the drum and grow back as they come out.
@@ -30,12 +42,15 @@ struct FlightOverlayView: View {
     }
 
     var body: some View {
+        let endKey: FrameKey = destinationKey
+        let fallbackEnd: CGRect = flight.end
+        let lookup: (FrameKey) -> CGRect? = liveFrame
         glyph
             .modifier(
                 FlightPathModifier(
                     progress: progress,
                     start: flight.start,
-                    end: flight.end,
+                    endProvider: { lookup(endKey) ?? fallbackEnd },
                     startScale: startScale,
                     endScale: endScale
                 )
@@ -51,14 +66,19 @@ struct FlightOverlayView: View {
             }
     }
 
+    private var tint: Color {
+        return itemTint(hex: flight.tintHex, colourGroup: flight.colourGroup)
+    }
+
     /// The flying card: tinted rounded square with the item's icon and a quantity badge.
     private var glyph: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(itemTint(hex: flight.tintHex, colourGroup: flight.colourGroup))
+                .fill(tint)
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .strokeBorder(Color.primary.opacity(0.12), lineWidth: 1)
             ItemIconView(icon: flight.icon, size: 30)
+                .environment(\.colorScheme, tint.contrastingScheme)
         }
         .frame(width: 64, height: 64)
         .overlay(alignment: .topTrailing) {
@@ -75,8 +95,10 @@ struct FlightOverlayView: View {
     }
 }
 
-/// Moves its content along a quadratic Bézier arc from the centre of `start` to the centre of `end`
-/// as `progress` goes from 0 to 1, scaling it from `startScale` to `endScale` on the way.
+/// Moves its content along a quadratic Bézier arc from the centre of `start` to the centre of the
+/// frame `endProvider` returns, as `progress` goes from 0 to 1, scaling it from `startScale` to
+/// `endScale` on the way. The end frame is re-read on every animation frame, so a layout shift
+/// during the flight (a "Why?" card appearing, a scroll) retargets the glyph instead of stranding it.
 ///
 /// `progress` is the animatable data, so `withAnimation { progress = 1 }` sweeps the whole path.
 /// Placement uses `.position(x:y:)`, i.e. the parent's coordinate space: the parent must be the
@@ -84,7 +106,7 @@ struct FlightOverlayView: View {
 struct FlightPathModifier: ViewModifier, Animatable {
     var progress: CGFloat
     let start: CGRect
-    let end: CGRect
+    let endProvider: () -> CGRect
     let startScale: CGFloat
     let endScale: CGFloat
 
@@ -113,6 +135,7 @@ struct FlightPathModifier: ViewModifier, Animatable {
     /// The point on the arc for the current progress.
     private var currentPoint: CGPoint {
         let t: CGFloat = clampedProgress
+        let end: CGRect = endProvider()
         let from = CGPoint(x: start.midX, y: start.midY)
         let to = CGPoint(x: end.midX, y: end.midY)
         let control = CGPoint(

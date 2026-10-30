@@ -78,6 +78,29 @@ extension Color {
     }
 }
 
+extension Color {
+    /// Relative luminance in sRGB (0 = black, 1 = white), or `nil` if the colour cannot be resolved.
+    var luminance: Double? {
+        let uiColor = UIColor(self)
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+        guard uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha) else { return nil }
+        return 0.2126 * Double(red) + 0.7152 * Double(green) + 0.0722 * Double(blue)
+    }
+
+    /// Whether dark text reads best on this colour. Unresolvable colours are treated as light.
+    var prefersDarkForeground: Bool {
+        return (luminance ?? 1) > 0.55
+    }
+
+    /// The colour scheme in which `.primary` contrasts with this colour used as a background.
+    var contrastingScheme: ColorScheme {
+        return prefersDarkForeground ? .light : .dark
+    }
+}
+
 /// The tint to paint an item's card and drum chip with: the saved hex, or the group's swatch.
 func itemTint(hex: String?, colourGroup: ColourGroup) -> Color {
     if let hex = hex, let color = Color(hex: hex) {

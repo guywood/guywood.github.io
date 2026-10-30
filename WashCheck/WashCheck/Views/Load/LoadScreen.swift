@@ -13,7 +13,7 @@ struct LoadScreen: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var viewModel = LoadViewModel()
-    @State private var frames: [FrameKey: CGRect] = [:]
+    @State private var frameStore = FrameStore()
     @State private var isAddingItem = false
     @State private var showAllConcerns = false
     @AppStorage(SettingsKeys.showNumericScores) private var showNumericScores = false
@@ -60,16 +60,22 @@ struct LoadScreen: View {
                 .padding(.top, 8)
                 .padding(.bottom, 24)
             }
+            .background(Color(.systemGroupedBackground))
             .onPreferenceChange(FramePreferenceKey.self) { newFrames in
                 // Newer SDKs mark this closure @Sendable; preferences are always delivered on the main actor.
+                // The store is a plain class, so updating it on every scroll frame does not re-render this view.
                 MainActor.assumeIsolated {
-                    frames = newFrames
+                    frameStore.update(newFrames)
                 }
             }
 
             ForEach(viewModel.flights) { flight in
-                FlightOverlayView(flight: flight, onFinished: { finished in flightFinished(finished) })
-                    .transition(.opacity.animation(.easeOut(duration: 0.15)))
+                FlightOverlayView(
+                    flight: flight,
+                    liveFrame: { key in frameStore.frame(for: key) },
+                    onFinished: { finished in flightFinished(finished) }
+                )
+                .transition(.opacity.animation(.easeOut(duration: 0.15)))
             }
             .allowsHitTesting(false)
         }
@@ -104,6 +110,8 @@ struct LoadScreen: View {
             ConcernGaugeView(assessment: assessment, showNumericScore: showNumericScores, weights: viewModel.weights)
         }
         .frame(height: 240)
+        // The machine and gauge are fixed-size drawings; their captions stop scaling at the largest non-accessibility size.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
     private func levelBlock(assessment: LoadAssessment) -> some View {
@@ -139,8 +147,8 @@ struct LoadScreen: View {
         }
         let direction: LoadViewModel.FlightDirection = item.isInDrum ? .outOfDrum : .intoDrum
         guard !reduceMotion,
-              let portholeFrame = frames[.porthole],
-              let cardFrame = frames[.card(item.uuid)] else {
+              let portholeFrame = frameStore.frame(for: .porthole),
+              let cardFrame = frameStore.frame(for: .card(item.uuid)) else {
             withAnimation(.easeInOut(duration: 0.25)) {
                 viewModel.setInDrum(item, !item.isInDrum)
             }
@@ -160,7 +168,10 @@ struct LoadScreen: View {
 
     /// Called by a flight overlay when its animation completes.
     private func flightFinished(_ flight: LoadViewModel.Flight) {
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.5)) {
+        // A flight cancelled by "Empty the drum" still completes its animation; it must not land or buzz.
+        guard viewModel.isInFlight(flight.itemID) else { return }
+        // The chip itself springs in through its own transition; the surrounding layout just eases.
+        withAnimation(.easeInOut(duration: 0.25)) {
             viewModel.finishFlight(flight, items: items)
         }
         switch flight.direction {

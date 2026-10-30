@@ -21,6 +21,20 @@ struct FramePreferenceKey: PreferenceKey {
     }
 }
 
+/// Holds the latest reported frames without being observable, so scrolling (which changes every
+/// card's frame) never re-renders the Load screen. It is read when a tap starts a flight.
+final class FrameStore {
+    private(set) var frames: [FrameKey: CGRect] = [:]
+
+    func update(_ frames: [FrameKey: CGRect]) {
+        self.frames = frames
+    }
+
+    func frame(for key: FrameKey) -> CGRect? {
+        return frames[key]
+    }
+}
+
 extension View {
     /// Reports this view's frame, in the Load screen's named coordinate space, under `key`.
     func reportFrame(_ key: FrameKey) -> some View {

@@ -82,6 +82,20 @@ struct ItemEditorSheet: View {
         return name.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    /// What VoiceOver reads for the current icon.
+    private var iconDescription: String {
+        switch icon {
+        case .emoji(let value):
+            return value
+        case .symbol(let symbolName):
+            return symbolName.replacingOccurrences(of: ".", with: " ")
+        }
+    }
+
+    private var swatchColumns: [GridItem] {
+        return Array(repeating: GridItem(.flexible(), spacing: 8), count: 3)
+    }
+
     private var tintFooter: String {
         if usesCustomTint {
             return "The card and drum chip use your custom tint."
@@ -114,15 +128,15 @@ struct ItemEditorSheet: View {
                     ItemIconView(icon: icon, size: 22)
                 }
             }
+            .accessibilityValue(iconDescription)
         }
     }
 
     private var colourSection: some View {
         Section {
-            HStack(spacing: 0) {
+            LazyVGrid(columns: swatchColumns, spacing: 10) {
                 ForEach(ColourGroup.allCases) { group in
                     colourSwatchButton(for: group)
-                        .frame(maxWidth: .infinity)
                 }
             }
             .padding(.vertical, 4)

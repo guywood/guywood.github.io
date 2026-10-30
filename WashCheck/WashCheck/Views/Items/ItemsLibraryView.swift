@@ -5,6 +5,7 @@ import SwiftUI
 struct ItemsLibraryView: View {
     @Query(sort: \ClothingItem.sortOrder) private var items: [ClothingItem]
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.editMode) private var editMode
     @State private var searchText = ""
     @State private var editingItem: ClothingItem?
     @State private var isAdding = false
@@ -27,31 +28,33 @@ struct ItemsLibraryView: View {
     }
 
     var body: some View {
-        Group {
+        // The List stays mounted even when empty so the Edit button and edit mode behave.
+        List {
+            ForEach(filtered) { item in
+                Button {
+                    editingItem = item
+                } label: {
+                    ItemLibraryRow(item: item)
+                }
+            }
+            .onDelete(perform: delete(at:))
+            .onMove(perform: moveAction)
+        }
+        .searchable(text: $searchText, prompt: "Search items")
+        .overlay {
             if items.isEmpty {
                 ContentUnavailableView(
                     "No items yet",
                     systemImage: "tshirt",
                     description: Text("Add the clothes you wash most often.")
                 )
-            } else {
-                List {
-                    ForEach(filtered) { item in
-                        Button {
-                            editingItem = item
-                        } label: {
-                            ItemLibraryRow(item: item)
-                        }
-                    }
-                    .onDelete(perform: delete(at:))
-                    .onMove(perform: moveAction)
-                }
-                .searchable(text: $searchText, prompt: "Search items")
-                .overlay {
-                    if filtered.isEmpty {
-                        ContentUnavailableView.search(text: searchText)
-                    }
-                }
+            } else if filtered.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
+        .onChange(of: items.isEmpty) { _, isEmpty in
+            if isEmpty {
+                editMode?.wrappedValue = .inactive
             }
         }
         .navigationTitle("Items")
