@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% if page.title %}{% assign t = page.title | append: " · " | append: site.title %}{% else %}{% assign t = site.title %}{% endif %}
+<title>{{ t | strip_html }}</title>
+<meta property="og:site_name" content="{{ site.title }}">
+<meta property="og:title" content="{{ t | strip_html }}">
+{% if page.image %}<meta property="og:image" content="{{ page.image | absolute_url }}">{% endif %}
+<link rel="stylesheet" href="{{ '/style.css' | relative_url }}">
+<link rel="alternate" type="application/atom+xml" title="{{ site.title }}" href="{{ '/feed.xml' | relative_url }}">
+</head>
+<body>
+<header class="topbar">
+  <div class="inner">
+    <a class="blog-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+    <nav><a href="{{ '/archive/' | relative_url }}">Archive</a></nav>
+  </div>
+</header>
+{{ content }}
+<footer class="footer">
+  <div class="inner">
+    <a href="{{ '/' | relative_url }}">Home</a>
+    <a href="{{ '/archive/' | relative_url }}">Archive</a>
+    <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
+  </div>
+</footer>
+</body>
+</html>

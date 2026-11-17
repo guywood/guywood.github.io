@@ -1,77 +1,17 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>guy wood</title>
-<meta property="og:site_name" content="guy wood">
-<meta property="og:title" content="guy wood">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<header class="topbar">
-  <div class="inner">
-    <a class="blog-title" href="./">guy wood</a>
-    <nav><a href="archive/">Archive</a></nav>
-  </div>
-</header>
+---
+layout: default
+---
 <div class="page">
   <main class="content">
-    <article class="post" id="post-47525232458">
-      <a class="photo" href="photos/47525232458.jpg"><img src="photos/47525232458.jpg" width="1280" height="960" alt="Cadran d&#x27;horloge, Musée d&#x27;Orsay (Clock face, Musée d&#x27;Orsay, Paris)"></a>
-      <div class="copy"><p>Cadran d&#x27;horloge, Musée d&#x27;Orsay</p><p>(Clock face, Musée d&#x27;Orsay, Paris)</p></div>
-      <div class="meta"><a href="#post-47525232458">April 9, 2013</a></div>
-    </article>
-    <article class="post" id="post-47523676571">
-      <a class="photo" href="photos/47523676571.jpg"><img src="photos/47523676571.jpg" width="1280" height="954" alt="Karlův most (Charles Bridge), at sunrise Prague, Czech Republic" loading="lazy"></a>
-      <div class="copy"><p>Karlův most (Charles Bridge), at sunrise</p><p>Prague, Czech Republic</p></div>
-      <div class="meta"><a href="#post-47523676571">April 9, 2013</a></div>
-    </article>
-    <article class="post" id="post-47513994141">
-      <a class="photo" href="photos/47513994141.jpg"><img src="photos/47513994141.jpg" width="1280" height="960" alt="Národní muzeum v Praha (National Museum in Prague)" loading="lazy"></a>
-      <div class="copy"><p>Národní muzeum v Praha (National Museum in Prague)</p></div>
-      <div class="meta"><a href="#post-47513994141">April 8, 2013</a></div>
-    </article>
-    <article class="post" id="post-45252047343">
-      <a class="photo" href="photos/45252047343.jpg"><img src="photos/45252047343.jpg" width="1280" height="956" alt="Toledo, España" loading="lazy"></a>
-      <div class="copy"><p>Toledo, España</p></div>
-      <div class="meta"><a href="#post-45252047343">March 13, 2013</a></div>
-    </article>
-    <article class="post" id="post-45135683516">
-      <a class="photo" href="photos/45135683516.jpg"><img src="photos/45135683516.jpg" width="1280" height="956" alt="El Alcázar de Toledo" loading="lazy"></a>
-      <div class="copy"><p>El Alcázar de Toledo</p></div>
-      <div class="meta"><a href="#post-45135683516">March 11, 2013</a></div>
-    </article>
-    <article class="post" id="post-45076476330">
-      <a class="photo" href="photos/45076476330.jpg"><img src="photos/45076476330.jpg" width="1280" height="958" alt="Sur l’arc de triomphe de l’Étoile, vers La Défense (On the Arc de Triomphe, looking towards La Défense)" loading="lazy"></a>
-      <div class="copy"><p>Sur l’arc de triomphe de l’Étoile, vers La Défense</p><p>(On the Arc de Triomphe, looking towards La Défense)</p></div>
-      <div class="meta"><a href="#post-45076476330">March 10, 2013</a></div>
-    </article>
-    <article class="post" id="post-44720306546">
-      <a class="photo" href="photos/44720306546.jpg"><img src="photos/44720306546.jpg" width="1280" height="979" alt="Sony Center am Potsdamer Platz (The Sony Center at Potsdamer Platz)" loading="lazy"></a>
-      <div class="copy"><p>Sony Center am Potsdamer Platz</p><p>(The Sony Center at Potsdamer Platz)</p></div>
-      <div class="meta"><a href="#post-44720306546">March 6, 2013</a></div>
-    </article>
-    <article class="post" id="post-44682726097">
-      <a class="photo" href="photos/44682726097.jpg"><img src="photos/44682726097.jpg" width="1280" height="1280" alt="Olympiastadion Berlin (Olympic Stadium, Berlin)" loading="lazy"></a>
-      <div class="copy"><p>Olympiastadion Berlin</p><p>(Olympic Stadium, Berlin)</p></div>
-      <div class="meta"><a href="#post-44682726097">March 5, 2013</a></div>
-    </article>
-    <article class="post" id="post-44445534533">
-      <a class="photo" href="photos/44445534533.jpg"><img src="photos/44445534533.jpg" width="1280" height="958" alt="Salted" loading="lazy"></a>
-      <div class="copy"><p>Salted</p></div>
-      <div class="meta"><a href="#post-44445534533">March 3, 2013</a></div>
-    </article>
+    {% for post in paginator.posts %}
+      {% include post.html post=post first=forloop.first %}
+    {% endfor %}
+    {% if paginator.total_pages > 1 %}
+    <nav class="prevnext">
+      {% if paginator.previous_page %}<a href="{{ paginator.previous_page_path | relative_url }}">&larr; Newer</a>{% else %}<span></span>{% endif %}
+      {% if paginator.next_page %}<a href="{{ paginator.next_page_path | relative_url }}">Older &rarr;</a>{% endif %}
+    </nav>
+    {% endif %}
   </main>
-  <aside class="sidebar">
-    <h1 class="side-title"><a href="./">guy wood</a></h1>
-  </aside>
+  {% include sidebar.html %}
 </div>
-<footer class="footer">
-  <div class="inner">
-    <a href="./">Home</a>
-    <a href="archive/">Archive</a>
-  </div>
-</footer>
-</body>
-</html>

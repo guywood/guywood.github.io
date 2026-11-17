@@ -1,0 +1,29 @@
+title: guy wood
+description: Photographs by Guy Wood.
+url: https://guywood.github.io
+timezone: America/New_York
+
+# New posts get addresses like /post/my-photo-title/
+permalink: /post/:title/
+
+plugins:
+  - jekyll-feed
+  - jekyll-paginate
+
+# Ten posts per page on the home page; older ones go to /page2/, /page3/ ...
+paginate: 10
+paginate_path: /page:num/
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+
+# Every post uses the post layout, so new posts don't need a "layout:" line.
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
