@@ -1,0 +1,76 @@
+/* Recreates the Tumblr "Effector" theme guywood.net used: dark page, white post panels, orange accent. */
+:root {
+  --bg: #464850;
+  --bar: #2f3036;
+  --panel: #ffffff;
+  --text: #8e8f96;
+  --ink: #3a3b40;
+  --accent: #f55b2c;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: 72px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: #fff; }
+
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+  background: var(--bar);
+  box-shadow: 0 2px 6px rgba(0,0,0,.35);
+}
+.topbar .inner, .footer .inner, .page { max-width: 1000px; margin: 0 auto; padding: 0 16px; }
+.topbar .inner { display: flex; align-items: center; justify-content: space-between; height: 52px; }
+.blog-title { color: #fff; font-size: 20px; font-weight: bold; letter-spacing: .02em; }
+.topbar nav a { color: rgba(255,255,255,.8); font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+.topbar nav a:hover { color: #fff; }
+
+.page { display: flex; gap: 32px; padding-top: 84px; padding-bottom: 32px; align-items: flex-start; }
+.content { flex: 0 1 700px; min-width: 0; }
+
+.post {
+  background: var(--panel);
+  margin-bottom: 36px;
+  box-shadow: 0 6px 12px -6px rgba(0,0,0,.6);
+}
+.post .photo { display: block; line-height: 0; }
+.post img { display: block; width: 100%; height: auto; }
+.copy { padding: 22px 28px 6px; font-family: Georgia, serif; font-size: 16px; color: var(--ink); }
+.copy p { margin: 0 0 12px; }
+.meta { padding: 10px 28px 14px; border-top: 1px solid #eee; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.meta a { color: #9a9ba1; }
+.meta a:hover { color: var(--accent); }
+
+.sidebar { flex: 0 0 240px; position: sticky; top: 84px; }
+.side-title { margin: 0 0 10px; font-size: 26px; }
+.side-title a { color: #fff; }
+.sidebar p { margin: 0; }
+
+.footer { border-top: 1px solid rgba(255,255,255,.08); padding: 20px 0 40px; font-size: 13px; }
+.footer .inner { display: flex; gap: 20px; }
+
+.archive main { width: 100%; }
+.month { color: #fff; font-size: 18px; margin: 0 0 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.thumb { position: relative; display: block; aspect-ratio: 1; overflow: hidden; background: var(--bar); }
+.thumb img { width: 100%; height: 100%; object-fit: cover; transition: opacity .2s; }
+.thumb span {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 12px;
+  background: linear-gradient(transparent, rgba(0,0,0,.75)); color: #fff; font-size: 13px;
+}
+.thumb small { display: block; color: rgba(255,255,255,.7); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.thumb:hover img { opacity: .85; }
+
+.notfound .copy { padding-bottom: 20px; }
+
+@media (max-width: 760px) {
+  .page { flex-direction: column; gap: 0; }
+  .sidebar { display: none; }
+  .copy, .meta { padding-left: 18px; padding-right: 18px; }
+}

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not found · guy wood</title>
+<meta property="og:site_name" content="guy wood">
+<meta property="og:title" content="Not found · guy wood">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="inner">
+    <a class="blog-title" href="/">guy wood</a>
+    <nav><a href="/archive/">Archive</a></nav>
+  </div>
+</header>
+<div class="page"><main class="content"><article class="post notfound"><div class="copy"><p>That page isn’t here.</p><p><a href="/">Back to the photos</a></p></div></article></main></div>
+<script>
+  // Send old Tumblr links like /post/47525232458/slug to the matching photo.
+  var m = location.pathname.match(/^\/post\/(\d+)/) || location.pathname.match(/^\/image\/(\d+)/);
+  if (m) location.replace('/#post-' + m[1]);
+  else if (/^\/(archive|rss)\/?$/.test(location.pathname)) location.replace('/archive/');
+</script>
+<footer class="footer">
+  <div class="inner">
+    <a href="/">Home</a>
+    <a href="/archive/">Archive</a>
+  </div>
+</footer>
+</body>
+</html>
